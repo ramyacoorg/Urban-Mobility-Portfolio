@@ -18,11 +18,12 @@ This group project is a client-side demonstration of pedestrian route guidance a
 
 HTML, CSS, JavaScript, Leaflet, OpenStreetMap, Python, and GeoJSON.
 
-## Source archive
+## Source code
 
-Download the complete source archive from [Urban-Mobility-And-Smart-Cities-main.zip](./Urban-Mobility-And-Smart-Cities-main.zip).
+The complete source archive is currently available in the original collaborative repository:
+https://github.com/R-veen-a/Urban-Mobility-And-Smart-Cities
 
-The application files in the archive are under `final vvce/pedestrain_system/`:
+The application files are under `final vvce/pedestrain_system/`:
 - `index.html`
 - `style.css`
 - `app.js`
@@ -31,7 +32,7 @@ The application files in the archive are under `final vvce/pedestrain_system/`:
 
 ## Run locally
 
-1. Download and extract the ZIP archive.
+1. Download and extract the source archive from the original project repository.
 2. Open `final vvce/pedestrain_system/index.html` in a modern browser.
 3. Allow internet access for map tiles.
 4. Set a start and destination on the map (or use the demo points).
@@ -39,6 +40,4 @@ The application files in the archive are under `final vvce/pedestrain_system/`:
 
 ## Collaboration acknowledgement
 
-This was developed as a group project. This repository is a portfolio copy maintained by Ramya S S. Contributions from the original team are acknowledged; please refer to the original collaborative repository and team records for individual contribution attribution.
-
-Original collaborative repository: https://github.com/R-veen-a/Urban-Mobility-And-Smart-Cities
+This was developed as a group project. This repository is a portfolio summary maintained by Ramya S S. Contributions from the original team members are acknowledged; please refer to the original collaborative repository and team records for individual contribution attribution.
