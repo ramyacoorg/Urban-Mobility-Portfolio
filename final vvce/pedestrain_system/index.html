@@ -1,0 +1,1210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pedestrian Roadmap & Guidance — Chinnaswamy Stadium</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Pedestrian Roadmap & Guidance</h1>
+        <div class="sub">M. Chinnaswamy Stadium — Bengaluru</div>
+      </div>
+      <div class="actions">
+        <button id="toggleSim">Start Simulation</button>
+        <button id="downloadZip"><a href="pedestrian_full_system.zip" download>Download ZIP</a></button>
+      </div>
+    </header>
+
+    <main>
+      <section id="mapWrap">
+        <div id="map"></div>
+        <div id="miniInfo" class="glass">
+          <div><strong>Mode:</strong> <span id="modeLabel">Demo (simulated)</span></div>
+          <div><strong>Active Clusters:</strong> <span id="clusterCount">0</span></div>
+          <div><strong>Last Alert:</strong> <span id="lastAlert">—</span></div>
+        </div>
+      </section>
+
+  <!-- Floating Chatbot -->
+  <div id="chatbot-toggle"><i class="fas fa-comments"></i></div>
+  <div id="chatbot-popup" class="hidden">
+    <div class="chat-header">
+      <h3>AI Assistant 🤖</h3>
+      <span id="close-chat">&times;</span>
+    </div>
+    <div class="chat-body" id="chatMessages"></div>
+    <div class="chat-input">
+      <input type="text" id="userMessage" placeholder="Ask something..." />
+      <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
+
+      <aside id="panel">
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+          <button class="nav-tab active" data-tab="overview">📊 Overview</button>
+          <button class="nav-tab" data-tab="routing">🗺️ Routing</button>
+          <button class="nav-tab" data-tab="crowd">👥 Crowd</button>
+          <button class="nav-tab" data-tab="parking">🚗 Parking</button>
+          <button class="nav-tab" data-tab="challenges">🌱 Challenges</button>
+          <button class="nav-tab" data-tab="ai-assistant">🤖 AI Assistant</button>
+          <button class="nav-tab" data-tab="transport">🚌 Transport</button>
+        </div>
+
+        <!-- Overview Dashboard -->
+        <div id="overview" class="tab-content active">
+          <div class="dashboard-header">
+            <h2>🏟️ Stadium Control Center</h2>
+            <div class="system-status">
+              <div class="status-indicator green"></div>
+              <span>All Systems Operational</span>
+            </div>
+          </div>
+
+          <!-- Key Metrics Grid -->
+          <div class="metrics-grid">
+            <div class="metric-card primary">
+              <div class="metric-icon">👥</div>
+              <div class="metric-content">
+                <div class="metric-value" id="totalCrowd">0</div>
+                <div class="metric-label">Total Crowd</div>
+                <div class="metric-trend positive">+12% from yesterday</div>
+              </div>
+            </div>
+            
+            <div class="metric-card success">
+              <div class="metric-icon">🚗</div>
+              <div class="metric-content">
+                <div class="metric-value" id="availableParking">127</div>
+                <div class="metric-label">Available Parking</div>
+                <div class="metric-trend neutral">3 zones active</div>
+              </div>
+            </div>
+            
+            <div class="metric-card warning">
+              <div class="metric-icon">⚠️</div>
+              <div class="metric-content">
+                <div class="metric-value" id="alertsCount">0</div>
+                <div class="metric-label">Active Alerts</div>
+                <div class="metric-trend positive">All clear</div>
+              </div>
+            </div>
+            
+            <div class="metric-card info">
+              <div class="metric-icon">🌱</div>
+              <div class="metric-content">
+                <div class="metric-value" id="greenPoints">0</div>
+                <div class="metric-label">Green Points</div>
+                <div class="metric-trend positive">+50 today</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="action-grid">
+              <button class="action-btn" id="quickRoute">
+                <div class="action-icon">🗺️</div>
+                <div class="action-text">Plan Route</div>
+              </button>
+              <button class="action-btn" id="quickParking">
+                <div class="action-icon">🅿️</div>
+                <div class="action-text">Find Parking</div>
+              </button>
+              <button class="action-btn" id="quickCrowd">
+                <div class="action-icon">👥</div>
+                <div class="action-text">Crowd Status</div>
+              </button>
+              <button class="action-btn" id="quickEmergency">
+                <div class="action-icon">🚨</div>
+                <div class="action-text">Emergency</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="recent-activity">
+            <h3>Recent Activity</h3>
+            <div class="activity-list" id="activityList">
+              <div class="activity-item">
+                <div class="activity-icon">✅</div>
+                <div class="activity-text">System initialized successfully</div>
+                <div class="activity-time">Just now</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Routing Dashboard -->
+        <div id="routing" class="tab-content">
+          <div class="dashboard-header">
+            <h2>🗺️ Smart Routing System</h2>
+            <div class="route-status">
+              <div class="status-indicator green"></div>
+              <span>Route Planning Ready</span>
+            </div>
+          </div>
+
+          <div class="routing-grid">
+            <!-- Route Planning -->
+            <div class="routing-section">
+              <h3>Route Planning</h3>
+              <div class="route-controls">
+                <button id="setDemo" class="route-btn primary">Place Demo Points</button>
+                <button id="computeRoute" class="route-btn success">Compute Safest Route</button>
+                <button id="droneWarn" class="route-btn warning">Drone Warning</button>
+              </div>
+              
+              <!-- Accessibility Options -->
+              <div class="accessibility-options">
+                <h4>♿ Accessibility Options</h4>
+                <div class="accessibility-grid">
+                  <label class="accessibility-option">
+                    <input type="checkbox" id="wheelchairAccess" checked>
+                    <span class="checkmark"></span>
+                    <span class="option-text">Wheelchair Accessible</span>
+                  </label>
+                  <label class="accessibility-option">
+                    <input type="checkbox" id="visualImpairment" checked>
+                    <span class="checkmark"></span>
+                    <span class="option-text">Visual Impairment Support</span>
+                  </label>
+                  <label class="accessibility-option">
+                    <input type="checkbox" id="mobilityAid" checked>
+                    <span class="checkmark"></span>
+                    <span class="option-text">Mobility Aid Friendly</span>
+                  </label>
+                  <label class="accessibility-option">
+                    <input type="checkbox" id="avoidStairs" checked>
+                    <span class="checkmark"></span>
+                    <span class="option-text">Avoid Stairs</span>
+                  </label>
+                </div>
+              </div>
+              
+              <div class="route-info">
+                <div class="route-point">
+                  <div class="point-label">Start</div>
+                  <div class="point-coords" id="startInfo">Click map to set</div>
+                </div>
+                <div class="route-point">
+                  <div class="point-label">Destination</div>
+                  <div class="point-coords" id="destInfo">Click map to set</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Route Details -->
+            <div class="routing-section">
+              <h3>Route Details</h3>
+              <div class="route-metrics">
+                <div class="metric-item">
+                  <div class="metric-label">Risk Level</div>
+                  <div class="metric-value" id="routeRisk">—</div>
+                </div>
+                <div class="metric-item">
+                  <div class="metric-label">Distance</div>
+                  <div class="metric-value" id="routeDistance">—</div>
+                </div>
+                <div class="metric-item">
+                  <div class="metric-label">Time</div>
+                  <div class="metric-value" id="routeTime">—</div>
+                </div>
+              </div>
+              
+              <div class="route-visualization">
+                <div class="route-path" id="routePath">
+                  <div class="path-line"></div>
+                  <div class="path-arrow">→</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Safety Analysis -->
+            <div class="routing-section">
+              <h3>Safety Analysis</h3>
+              
+              <!-- Dangerous Routes Warning -->
+              <div class="dangerous-routes">
+                <h4>⚠️ Dangerous Routes to Avoid</h4>
+                <div class="danger-list" id="dangerList">
+                  <div class="danger-item">
+                    <div class="danger-icon">🚧</div>
+                    <div class="danger-info">
+                      <div class="danger-location">Construction Zone - North Gate</div>
+                      <div class="danger-reason">Heavy machinery, uneven surfaces</div>
+                    </div>
+                    <div class="danger-severity high">High Risk</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Heat Map Controls -->
+              <div class="heatmap-controls">
+                <h4>🔥 Safety Heat Map</h4>
+                <div class="heatmap-options">
+                  <button id="toggleHeatmap" class="heatmap-btn">Show Heat Map</button>
+                  <button id="updateHeatmap" class="heatmap-btn secondary">Update Data</button>
+                </div>
+                <div class="heatmap-legend">
+                  <div class="heat-item">
+                    <div class="heat-color safe"></div>
+                    <span>Safe (0-30%)</span>
+                  </div>
+                  <div class="heat-item">
+                    <div class="heat-color moderate"></div>
+                    <span>Moderate (30-60%)</span>
+                  </div>
+                  <div class="heat-item">
+                    <div class="heat-color dangerous"></div>
+                    <span>Dangerous (60-100%)</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Risk Zones -->
+              <div class="risk-zones">
+                <h4>Risk Zones</h4>
+                <div class="legend">
+                  <div class="legend-item">
+                    <span class="dot green"></span>
+                    <span>Safe (0–30%)</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="dot yellow"></span>
+                    <span>Moderate (30–60%)</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="dot red"></span>
+                    <span>High (60–100%)</span>
+                  </div>
+                </div>
+                <ul id="riskZones" class="risk-list"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Crowd Monitoring Dashboard -->
+        <div id="crowd" class="tab-content">
+          <div class="dashboard-header">
+            <h2>👥 Crowd Flow Optimization</h2>
+            <div class="crowd-status">
+              <div class="status-indicator green"></div>
+              <span>Monitoring Active</span>
+            </div>
+          </div>
+
+          <!-- Camera Feed Section -->
+          <div class="camera-section">
+            <h3>📹 Live Camera Feed</h3>
+            <div class="camera-container">
+              <video id="cameraFeed" autoplay muted playsinline></video>
+              <canvas id="detectionCanvas"></canvas>
+              <div class="camera-controls">
+                <button id="startCamera" class="camera-btn primary">Start Camera</button>
+                <button id="stopCamera" class="camera-btn secondary" disabled>Stop Camera</button>
+                <button id="toggleDetection" class="camera-btn success" disabled>Toggle Detection</button>
+              </div>
+              <div class="camera-status">
+                <div class="status-indicator" id="cameraStatus"></div>
+                <span id="cameraStatusText">Camera Offline</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Crowd Detection Results -->
+          <div class="detection-results">
+            <h3>🔍 Detection Results</h3>
+            <div class="detection-stats">
+              <div class="stat-item">
+                <div class="stat-value" id="detectedPeople">0</div>
+                <div class="stat-label">People Detected</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="crowdDensity">0%</div>
+                <div class="stat-label">Crowd Density</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="zoneStatus">Safe</div>
+                <div class="stat-label">Zone Status</div>
+              </div>
+            </div>
+            <div class="zone-alerts" id="zoneAlerts">
+              <!-- Alert messages will be inserted here -->
+            </div>
+          </div>
+
+          <!-- Energy-Aware Smart Lighting -->
+          <div class="energy-lighting-section">
+            <h3>💡 Smart Streetlight Control</h3>
+            <div class="lighting-grid">
+              <div class="lighting-zone">
+                <h4>North Gate Area</h4>
+                <div class="lighting-controls">
+                  <div class="light-intensity">
+                    <span class="intensity-label">Intensity</span>
+                    <div class="intensity-bar">
+                      <div class="intensity-fill" id="northIntensity" style="width: 75%"></div>
+                    </div>
+                    <span class="intensity-value" id="northValue">75%</span>
+                  </div>
+                  <div class="light-status">
+                    <div class="status-indicator" id="northStatus"></div>
+                    <span id="northMode">Adaptive Mode</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="lighting-zone">
+                <h4>East Gate Area</h4>
+                <div class="lighting-controls">
+                  <div class="light-intensity">
+                    <span class="intensity-label">Intensity</span>
+                    <div class="intensity-bar">
+                      <div class="intensity-fill" id="eastIntensity" style="width: 60%"></div>
+                    </div>
+                    <span class="intensity-value" id="eastValue">60%</span>
+                  </div>
+                  <div class="light-status">
+                    <div class="status-indicator" id="eastStatus"></div>
+                    <span id="eastMode">Energy Saving</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="lighting-zone">
+                <h4>South Gate Area</h4>
+                <div class="lighting-controls">
+                  <div class="light-intensity">
+                    <span class="intensity-label">Intensity</span>
+                    <div class="intensity-bar">
+                      <div class="intensity-fill" id="southIntensity" style="width: 90%"></div>
+                    </div>
+                    <span class="intensity-value" id="southValue">90%</span>
+                  </div>
+                  <div class="light-status">
+                    <div class="status-indicator" id="southStatus"></div>
+                    <span id="southMode">High Density</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="lighting-zone">
+                <h4>West Gate Area</h4>
+                <div class="lighting-controls">
+                  <div class="light-intensity">
+                    <span class="intensity-label">Intensity</span>
+                    <div class="intensity-bar">
+                      <div class="intensity-fill" id="westIntensity" style="width: 45%"></div>
+                    </div>
+                    <span class="intensity-value" id="westValue">45%</span>
+                  </div>
+                  <div class="light-status">
+                    <div class="status-indicator" id="westStatus"></div>
+                    <span id="westMode">Low Density</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="energy-stats">
+              <div class="energy-metric">
+                <div class="metric-icon">⚡</div>
+                <div class="metric-info">
+                  <div class="metric-value" id="energySaved">24.5 kWh</div>
+                  <div class="metric-label">Energy Saved Today</div>
+                </div>
+              </div>
+              <div class="energy-metric">
+                <div class="metric-icon">💰</div>
+                <div class="metric-info">
+                  <div class="metric-value" id="costSaved">₹245</div>
+                  <div class="metric-label">Cost Saved</div>
+                </div>
+              </div>
+              <div class="energy-metric">
+                <div class="metric-icon">🌱</div>
+                <div class="metric-info">
+                  <div class="metric-value" id="co2Reduced">12.3 kg</div>
+                  <div class="metric-label">CO₂ Reduced</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Smart Display Boards -->
+          <div class="display-boards-section">
+            <h3>📺 Adaptive Display Boards</h3>
+            <div class="display-grid">
+              <div class="display-board">
+                <div class="display-header">
+                  <h4>North Gate Display</h4>
+                  <div class="display-status active">LIVE</div>
+                </div>
+                <div class="display-content" id="northDisplay">
+                  <div class="display-message">🚶 Walk to Metro: 5 min</div>
+                  <div class="display-info">Next Metro: 3 min | Crowd: Low</div>
+                </div>
+              </div>
+              
+              <div class="display-board">
+                <div class="display-header">
+                  <h4>East Gate Display</h4>
+                  <div class="display-status warning">CROWDED</div>
+                </div>
+                <div class="display-content" id="eastDisplay">
+                  <div class="display-message">🚌 Use Bus Stop B: 2 min</div>
+                  <div class="display-info">Next Bus: 8 min | Crowd: High</div>
+                </div>
+              </div>
+              
+              <div class="display-board">
+                <div class="display-header">
+                  <h4>South Gate Display</h4>
+                  <div class="display-status active">LIVE</div>
+                </div>
+                <div class="display-content" id="southDisplay">
+                  <div class="display-message">🚴 E-bike Available: 1 min</div>
+                  <div class="display-info">Battery: 85% | Distance: 2.3 km</div>
+                </div>
+              </div>
+              
+              <div class="display-board">
+                <div class="display-header">
+                  <h4>West Gate Display</h4>
+                  <div class="display-status active">LIVE</div>
+                </div>
+                <div class="display-content" id="westDisplay">
+                  <div class="display-message">🚶 Direct Walk: 8 min</div>
+                  <div class="display-info">Route: Safe | Weather: Clear</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="crowd-grid">
+            <!-- Density Monitoring -->
+            <div class="crowd-section">
+              <h3>Real-time Density</h3>
+              <div class="density-grid">
+                <div class="density-zone" data-zone="north">
+                  <div class="zone-header">
+                    <div class="zone-icon">🏟️</div>
+                    <div class="zone-name">North Gate</div>
+                  </div>
+                  <div class="density-meter">
+                    <div class="density-bar">
+                      <div class="density-fill" id="northDensity" style="width: 0%"></div>
+                    </div>
+                    <div class="density-info">
+                      <span class="density-text" id="northText">Low</span>
+                      <span class="crowd-count" id="northCount">0 people</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="density-zone" data-zone="east">
+                  <div class="zone-header">
+                    <div class="zone-icon">🚪</div>
+                    <div class="zone-name">East Gate</div>
+                  </div>
+                  <div class="density-meter">
+                    <div class="density-bar">
+                      <div class="density-fill" id="eastDensity" style="width: 0%"></div>
+                    </div>
+                    <div class="density-info">
+                      <span class="density-text" id="eastText">Low</span>
+                      <span class="crowd-count" id="eastCount">0 people</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="density-zone" data-zone="south">
+                  <div class="zone-header">
+                    <div class="zone-icon">🚶‍♂️</div>
+                    <div class="zone-name">South Gate</div>
+                  </div>
+                  <div class="density-meter">
+                    <div class="density-bar">
+                      <div class="density-fill" id="southDensity" style="width: 0%"></div>
+                    </div>
+                    <div class="density-info">
+                      <span class="density-text" id="southText">Low</span>
+                      <span class="crowd-count" id="southCount">0 people</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="density-zone" data-zone="west">
+                  <div class="zone-header">
+                    <div class="zone-icon">🚶‍♀️</div>
+                    <div class="zone-name">West Gate</div>
+                  </div>
+                  <div class="density-meter">
+                    <div class="density-bar">
+                      <div class="density-fill" id="westDensity" style="width: 0%"></div>
+                    </div>
+                    <div class="density-info">
+                      <span class="density-text" id="westText">Low</span>
+                      <span class="crowd-count" id="westCount">0 people</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Smart Suggestions -->
+            <div class="crowd-section">
+              <h3>Smart Suggestions</h3>
+              <div class="suggestion-list" id="suggestionList">
+                <div class="suggestion-item">
+                  <div class="suggestion-icon">✅</div>
+                  <div class="suggestion-text">All paths currently optimal</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Traffic Control -->
+            <div class="crowd-section">
+              <h3>Traffic Control</h3>
+              <div class="traffic-controls">
+                <button id="optimizeTiming" class="control-btn primary">Optimize Timing</button>
+                <button id="emergencyMode" class="control-btn emergency">Emergency Mode</button>
+              </div>
+              <div class="signal-status" id="signalStatus">
+                <div class="status-indicator green"></div>
+                <span>Normal Operation</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parking Dashboard -->
+        <div id="parking" class="tab-content">
+          <div class="dashboard-header">
+            <h2>🚗 Smart Parking System</h2>
+            <div class="parking-status">
+              <div class="status-indicator green"></div>
+              <span>AI Prediction Active</span>
+            </div>
+          </div>
+
+          <div class="parking-grid">
+            <!-- Demand Prediction -->
+            <div class="parking-section">
+              <h3>AI Demand Prediction</h3>
+              <div class="prediction-stats">
+                <div class="prediction-item">
+                  <div class="prediction-value" id="currentDemand">65%</div>
+                  <div class="prediction-label">Current Demand</div>
+                </div>
+                <div class="prediction-item">
+                  <div class="prediction-value" id="predictedDemand">78%</div>
+                  <div class="prediction-label">Predicted (1hr)</div>
+                </div>
+                <div class="prediction-item">
+                  <div class="prediction-value" id="availableSpots">127</div>
+                  <div class="prediction-label">Available Spots</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Parking Zones -->
+            <div class="parking-section">
+              <h3>Parking Zones</h3>
+              <div class="zone-grid">
+                <div class="parking-zone" data-zone="A">
+                  <div class="zone-header">
+                    <span class="zone-name">Zone A</span>
+                    <span class="zone-status available">Available</span>
+                  </div>
+                  <div class="zone-capacity">
+                    <div class="capacity-bar">
+                      <div class="capacity-fill" id="zoneACapacity" style="width: 30%"></div>
+                    </div>
+                    <span class="capacity-text">30/100 spots</span>
+                  </div>
+                  <div class="zone-distance">0.2 km away</div>
+                </div>
+                
+                <div class="parking-zone" data-zone="B">
+                  <div class="zone-header">
+                    <span class="zone-name">Zone B</span>
+                    <span class="zone-status moderate">Moderate</span>
+                  </div>
+                  <div class="zone-capacity">
+                    <div class="capacity-bar">
+                      <div class="capacity-fill" id="zoneBCapacity" style="width: 65%"></div>
+                    </div>
+                    <span class="capacity-text">65/100 spots</span>
+                  </div>
+                  <div class="zone-distance">0.4 km away</div>
+                </div>
+                
+                <div class="parking-zone" data-zone="C">
+                  <div class="zone-header">
+                    <span class="zone-name">Zone C</span>
+                    <span class="zone-status full">Full</span>
+                  </div>
+                  <div class="zone-capacity">
+                    <div class="capacity-bar">
+                      <div class="capacity-fill" id="zoneCCapacity" style="width: 100%"></div>
+                    </div>
+                    <span class="capacity-text">100/100 spots</span>
+                  </div>
+                  <div class="zone-distance">0.6 km away</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Smart Guidance -->
+            <div class="parking-section">
+              <h3>Smart Guidance</h3>
+              <div class="guidance-message" id="guidanceMessage">
+                <div class="guidance-icon">🎯</div>
+                <div class="guidance-text">Head to Zone A for best availability</div>
+              </div>
+              <div class="guidance-actions">
+                <button id="findParking" class="guidance-btn">Find Best Spot</button>
+                <button id="reserveSpot" class="guidance-btn">Reserve Spot</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Challenges Dashboard -->
+        <div id="challenges" class="tab-content">
+          <div class="dashboard-header">
+            <h2>🌱 Green Commute Challenges</h2>
+            <div class="challenge-status">
+              <div class="status-indicator green"></div>
+              <span>Challenges Active</span>
+            </div>
+          </div>
+
+          <div class="challenges-grid">
+            <div class="challenge-card" data-challenge="no-car-week">
+              <div class="challenge-icon">🚗❌</div>
+              <h3>No Car Week</h3>
+              <p>Go car-free for 7 days</p>
+              <div class="challenge-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <span class="progress-text">0/7 days</span>
+              </div>
+              <button class="join-challenge">Join Challenge</button>
+            </div>
+            
+            <div class="challenge-card" data-challenge="walk-10km">
+              <div class="challenge-icon">🚶‍♂️</div>
+              <h3>Walk 10km Challenge</h3>
+              <p>Walk 10 kilometers this week</p>
+              <div class="challenge-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <span class="progress-text">0/10 km</span>
+              </div>
+              <button class="join-challenge">Join Challenge</button>
+            </div>
+            
+            <div class="challenge-card" data-challenge="cycle-friday">
+              <div class="challenge-icon">🚴‍♂️</div>
+              <h3>Cycle to Office Friday</h3>
+              <p>Bike to work every Friday</p>
+              <div class="challenge-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <span class="progress-text">0/4 Fridays</span>
+              </div>
+              <button class="join-challenge">Join Challenge</button>
+            </div>
+          </div>
+
+          <!-- Community Impact -->
+          <div class="community-impact">
+            <h3>Community Impact</h3>
+            <div class="impact-stats">
+              <div class="stat-item">
+                <div class="stat-value" id="co2Saved">0 kg</div>
+                <div class="stat-label">CO₂ Saved</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="greenPoints">0</div>
+                <div class="stat-label">Green Points</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="activeUsers">0</div>
+                <div class="stat-label">Active Users</div>
+              </div>
+            </div>
+            
+            <div class="leaderboard">
+              <h4>Community Leaders</h4>
+              <div class="leaderboard-list" id="leaderboardList">
+                <div class="leaderboard-item">
+                  <span class="rank">1</span>
+                  <span class="name">EcoWarrior_2024</span>
+                  <span class="points">2,450 pts</span>
+                </div>
+                <div class="leaderboard-item">
+                  <span class="rank">2</span>
+                  <span class="name">GreenCommuter</span>
+                  <span class="points">2,100 pts</span>
+                </div>
+                <div class="leaderboard-item">
+                  <span class="rank">3</span>
+                  <span class="name">BikeLover99</span>
+                  <span class="points">1,890 pts</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="achievements">
+              <h4>Your Achievements</h4>
+              <div class="achievement-grid" id="achievementGrid">
+                <div class="achievement locked" data-achievement="first-steps">
+                  <div class="achievement-icon">🌱</div>
+                  <div class="achievement-name">First Steps</div>
+                  <div class="achievement-desc">Walk 1km</div>
+                </div>
+                <div class="achievement locked" data-achievement="wheel-deal">
+                  <div class="achievement-icon">🚴‍♂️</div>
+                  <div class="achievement-name">Wheel Deal</div>
+                  <div class="achievement-desc">Cycle 5km</div>
+                </div>
+                <div class="achievement locked" data-achievement="eco-hero">
+                  <div class="achievement-icon">🌍</div>
+                  <div class="achievement-name">Eco Hero</div>
+                  <div class="achievement-desc">Save 10kg CO₂</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Chatbot Dashboard -->
+      <div id="ai-assistant" class="tab-content">
+        <div class="dashboard-header">
+        <h2>🤖 Smart AI Assistant</h2>
+      <div class="ai-status">
+       <div class="status-indicator green"></div>
+       <span>GenAI Chat Ready</span>
+    </div>
+  </div>
+
+  <div class="chat-container">
+    <div id="chatMessages" class="chat-messages"></div>
+    <div class="chat-input-box">
+      <input type="text" id="userMessage" placeholder="Ask me anything about the system..." />
+      <button id="sendMessage">Send</button>
+    </div>
+  </div>
+</div>
+
+
+          <!-- Voice Interface -->
+          <div class="voice-interface-section">
+            <h3>🎤 Voice Interaction</h3>
+            <div class="voice-container">
+              <div class="voice-visualizer">
+                <div class="voice-circle" id="voiceCircle">
+                  <div class="voice-icon">🎤</div>
+                </div>
+                <div class="voice-status" id="voiceStatus">Tap to speak</div>
+              </div>
+              <div class="voice-controls">
+                <button id="startVoice" class="voice-btn primary">Start Voice</button>
+                <button id="stopVoice" class="voice-btn secondary" disabled>Stop Voice</button>
+                <button id="emergencyCall" class="voice-btn emergency">Emergency Call</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Interface -->
+          <div class="chat-interface-section">
+            <h3>💬 Text Chat</h3>
+            <div class="chat-container">
+              <div class="chat-messages" id="chatMessages">
+                <div class="chat-message ai-message">
+                  <div class="message-avatar">🤖</div>
+                  <div class="message-content">
+                    <div class="message-text">Hello! I'm your AI crisis assistant. I can help you with emergency situations, find safe exits, locate medical help, and provide guidance. How can I assist you today?</div>
+                    <div class="message-time">Just now</div>
+                  </div>
+                </div>
+              </div>
+              <div class="chat-input-container">
+                <input type="text" id="chatInput" placeholder="Type your message or emergency request..." class="chat-input">
+                <button id="sendMessage" class="send-btn">Send</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="emergency-actions-section">
+            <h3>🚨 Emergency Quick Actions</h3>
+            <div class="emergency-grid">
+              <button class="emergency-btn medical" id="medicalHelp">
+                <div class="emergency-icon">🏥</div>
+                <div class="emergency-text">Medical Help</div>
+              </button>
+              <button class="emergency-btn fire" id="fireEmergency">
+                <div class="emergency-icon">🔥</div>
+                <div class="emergency-text">Fire Emergency</div>
+              </button>
+              <button class="emergency-btn security" id="securityAlert">
+                <div class="emergency-icon">🛡️</div>
+                <div class="emergency-text">Security Alert</div>
+              </button>
+              <button class="emergency-btn evacuation" id="evacuationRoute">
+                <div class="emergency-icon">🚪</div>
+                <div class="emergency-text">Evacuation Route</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Emergency Contacts -->
+          <div class="emergency-contacts-section">
+            <h3>📞 Emergency Contacts</h3>
+            <div class="contacts-grid">
+              <div class="contact-card">
+                <div class="contact-icon">🚑</div>
+                <div class="contact-info">
+                  <div class="contact-name">Ambulance</div>
+                  <div class="contact-number">108</div>
+                </div>
+                <button class="contact-btn" onclick="callEmergency('ambulance')">Call</button>
+              </div>
+              <div class="contact-card">
+                <div class="contact-icon">🚒</div>
+                <div class="contact-info">
+                  <div class="contact-name">Fire Department</div>
+                  <div class="contact-number">101</div>
+                </div>
+                <button class="contact-btn" onclick="callEmergency('fire')">Call</button>
+              </div>
+              <div class="contact-card">
+                <div class="contact-icon">👮</div>
+                <div class="contact-info">
+                  <div class="contact-name">Police</div>
+                  <div class="contact-number">100</div>
+                </div>
+                <button class="contact-btn" onclick="callEmergency('police')">Call</button>
+              </div>
+              <div class="contact-card">
+                <div class="contact-icon">🏥</div>
+                <div class="contact-info">
+                  <div class="contact-name">Hospital</div>
+                  <div class="contact-number">+91-80-2222-2222</div>
+                </div>
+                <button class="contact-btn" onclick="callEmergency('hospital')">Call</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Location Services -->
+          <div class="location-services-section">
+            <h3>📍 Location Services</h3>
+            <div class="location-info">
+              <div class="location-status">
+                <div class="status-indicator" id="locationStatus"></div>
+                <span id="locationStatusText">Getting your location...</span>
+              </div>
+              <div class="location-details" id="locationDetails">
+                <div class="location-item">
+                  <span class="location-label">Current Location:</span>
+                  <span class="location-value" id="currentLocation">Loading...</span>
+                </div>
+                <div class="location-item">
+                  <span class="location-label">Nearest Exit:</span>
+                  <span class="location-value" id="nearestExit">Calculating...</span>
+                </div>
+                <div class="location-item">
+                  <span class="location-label">Distance to Safety:</span>
+                  <span class="location-value" id="distanceToSafety">Calculating...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Crisis Response Status -->
+          <div class="crisis-status-section">
+            <h3>🚨 Crisis Response Status</h3>
+            <div class="crisis-status-grid">
+              <div class="status-card safe" id="overallStatus">
+                <div class="status-icon">✅</div>
+                <div class="status-content">
+                  <div class="status-title">Overall Status</div>
+                  <div class="status-value">Safe</div>
+                </div>
+              </div>
+              <div class="status-card" id="crowdStatus">
+                <div class="status-icon">👥</div>
+                <div class="status-content">
+                  <div class="status-title">Crowd Density</div>
+                  <div class="status-value">Low</div>
+                </div>
+              </div>
+              <div class="status-card" id="exitStatus">
+                <div class="status-icon">🚪</div>
+                <div class="status-content">
+                  <div class="status-title">Exit Availability</div>
+                  <div class="status-value">All Clear</div>
+                </div>
+              </div>
+              <div class="status-card" id="emergencyStatus">
+                <div class="status-icon">🚨</div>
+                <div class="status-content">
+                  <div class="status-title">Emergency Services</div>
+                  <div class="status-value">Standby</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transport Dashboard -->
+        <div id="transport" class="tab-content">
+          <div class="dashboard-header">
+            <h2>🚌 Multi-Modal Transport Integration</h2>
+            <div class="transport-status">
+              <div class="status-indicator green"></div>
+              <span>APIs Connected</span>
+            </div>
+          </div>
+
+          <div class="transport-grid">
+            <!-- Metro Integration -->
+            <div class="transport-section">
+              <h3>🚇 Metro Services</h3>
+              <div class="metro-info">
+                <div class="metro-station">
+                  <div class="station-header">
+                    <div class="station-icon">🚇</div>
+                    <div class="station-name">Vidhana Soudha Metro</div>
+                    <div class="station-distance">0.8 km</div>
+                  </div>
+                  <div class="metro-routes">
+                    <div class="route-info">
+                      <div class="route-line purple">Purple Line</div>
+                      <div class="route-details">
+                        <span class="next-train">Next: 3 min</span>
+                        <span class="destination">→ Baiyappanahalli</span>
+                      </div>
+                    </div>
+                    <div class="route-info">
+                      <div class="route-line green">Green Line</div>
+                      <div class="route-details">
+                        <span class="next-train">Next: 7 min</span>
+                        <span class="destination">→ Nagasandra</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="metro-station">
+                  <div class="station-header">
+                    <div class="station-icon">🚇</div>
+                    <div class="station-name">Cubbon Park Metro</div>
+                    <div class="station-distance">1.2 km</div>
+                  </div>
+                  <div class="metro-routes">
+                    <div class="route-info">
+                      <div class="route-line purple">Purple Line</div>
+                      <div class="route-details">
+                        <span class="next-train">Next: 5 min</span>
+                        <span class="destination">→ Whitefield</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- BMTC Bus Integration -->
+            <div class="transport-section">
+              <h3>🚌 BMTC Bus Services</h3>
+              <div class="bus-info">
+                <div class="bus-stop">
+                  <div class="stop-header">
+                    <div class="stop-icon">🚌</div>
+                    <div class="stop-name">Vidhana Soudha Bus Stop</div>
+                    <div class="stop-distance">0.5 km</div>
+                  </div>
+                  <div class="bus-routes">
+                    <div class="bus-route">
+                      <div class="route-number">Route 201</div>
+                      <div class="route-details">
+                        <span class="next-bus">Next: 4 min</span>
+                        <span class="destination">→ Majestic</span>
+                        <span class="frequency">Every 8 min</span>
+                      </div>
+                    </div>
+                    <div class="bus-route">
+                      <div class="route-number">Route 500</div>
+                      <div class="route-details">
+                        <span class="next-bus">Next: 12 min</span>
+                        <span class="destination">→ Electronic City</span>
+                        <span class="frequency">Every 15 min</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="bus-stop">
+                  <div class="stop-header">
+                    <div class="stop-icon">🚌</div>
+                    <div class="stop-name">Cubbon Park Bus Stop</div>
+                    <div class="stop-distance">1.0 km</div>
+                  </div>
+                  <div class="bus-routes">
+                    <div class="bus-route">
+                      <div class="route-number">Route 171</div>
+                      <div class="route-details">
+                        <span class="next-bus">Next: 6 min</span>
+                        <span class="destination">→ Kempegowda Bus Station</span>
+                        <span class="frequency">Every 10 min</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- E-bike & Last Mile -->
+            <div class="transport-section">
+              <h3>🚴 E-bike & Last Mile</h3>
+              <div class="ebike-info">
+                <div class="ebike-station">
+                  <div class="station-header">
+                    <div class="station-icon">🚴</div>
+                    <div class="station-name">E-bike Station A</div>
+                    <div class="station-distance">0.3 km</div>
+                  </div>
+                  <div class="ebike-details">
+                    <div class="bike-available">
+                      <span class="bike-count">8 bikes</span>
+                      <span class="battery-level">Avg: 85%</span>
+                    </div>
+                    <div class="pricing">
+                      <span class="rate">₹2/min</span>
+                      <span class="deposit">₹500 deposit</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="ebike-station">
+                  <div class="station-header">
+                    <div class="station-icon">🚴</div>
+                    <div class="station-name">E-bike Station B</div>
+                    <div class="station-distance">0.7 km</div>
+                  </div>
+                  <div class="ebike-details">
+                    <div class="bike-available">
+                      <span class="bike-count">12 bikes</span>
+                      <span class="battery-level">Avg: 92%</span>
+                    </div>
+                    <div class="pricing">
+                      <span class="rate">₹2/min</span>
+                      <span class="deposit">₹500 deposit</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Multi-Modal Recommendations -->
+            <div class="transport-section">
+              <h3>🎯 Smart Recommendations</h3>
+              <div class="recommendations">
+                <div class="recommendation-card best">
+                  <div class="rec-header">
+                    <div class="rec-icon">⭐</div>
+                    <div class="rec-title">Best Route</div>
+                    <div class="rec-time">12 min</div>
+                  </div>
+                  <div class="rec-details">
+                    <div class="rec-step">
+                      <span class="step-icon">🚶</span>
+                      <span class="step-text">Walk 3 min to Metro</span>
+                    </div>
+                    <div class="rec-step">
+                      <span class="step-icon">🚇</span>
+                      <span class="step-text">Metro 5 min to Cubbon Park</span>
+                    </div>
+                    <div class="rec-step">
+                      <span class="step-icon">🚴</span>
+                      <span class="step-text">E-bike 4 min to destination</span>
+                    </div>
+                  </div>
+                  <div class="rec-cost">Total: ₹25 | CO₂: 0.2 kg</div>
+                </div>
+                
+                <div class="recommendation-card">
+                  <div class="rec-header">
+                    <div class="rec-icon">🚌</div>
+                    <div class="rec-title">Budget Option</div>
+                    <div class="rec-time">18 min</div>
+                  </div>
+                  <div class="rec-details">
+                    <div class="rec-step">
+                      <span class="step-icon">🚶</span>
+                      <span class="step-text">Walk 2 min to Bus Stop</span>
+                    </div>
+                    <div class="rec-step">
+                      <span class="step-icon">🚌</span>
+                      <span class="step-text">Bus 12 min to Majestic</span>
+                    </div>
+                    <div class="rec-step">
+                      <span class="step-icon">🚶</span>
+                      <span class="step-text">Walk 4 min to destination</span>
+                    </div>
+                  </div>
+                  <div class="rec-cost">Total: ₹15 | CO₂: 0.1 kg</div>
+                </div>
+                
+                <div class="recommendation-card">
+                  <div class="rec-header">
+                    <div class="rec-icon">🚶</div>
+                    <div class="rec-title">Direct Walk</div>
+                    <div class="rec-time">25 min</div>
+                  </div>
+                  <div class="rec-details">
+                    <div class="rec-step">
+                      <span class="step-icon">🚶</span>
+                      <span class="step-text">Direct walk via safe route</span>
+                    </div>
+                  </div>
+                  <div class="rec-cost">Total: ₹0 | CO₂: 0 kg</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>Demo system — replace simulated inputs with live sensors or camera analytics for production.</footer>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
