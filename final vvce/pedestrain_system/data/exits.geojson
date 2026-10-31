@@ -1,0 +1,89 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "North Gate",
+        "type": "exit"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5996565,
+          12.980013000000001
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "East Gate",
+        "type": "exit"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.6009565,
+          12.978813
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "South Gate",
+        "type": "exit"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5996565,
+          12.977713000000001
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "West Gate",
+        "type": "exit"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.59825649999999,
+          12.978813
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Choke Point 1",
+        "type": "choke"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.6002565,
+          12.979213000000001
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Open Space",
+        "type": "open"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5987565,
+          12.979613
+        ]
+      }
+    }
+  ]
+}
