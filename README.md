@@ -20,19 +20,18 @@ HTML, CSS, JavaScript, Leaflet, OpenStreetMap, Python, and GeoJSON.
 
 ## Source code
 
-The complete source archive is currently available in the original collaborative repository:
-https://github.com/R-veen-a/Urban-Mobility-And-Smart-Cities
+The source files are available directly in this repository:
 
-The application files are under `final vvce/pedestrain_system/`:
-- `index.html`
-- `style.css`
-- `app.js`
-- `chat_backend.py`
-- `data/exits.geojson`
+- [Open the application folder](./tree/main/final%20vvce/pedestrain_system)
+- [index.html](./blob/main/final%20vvce/pedestrain_system/index.html)
+- [style.css](./blob/main/final%20vvce/pedestrain_system/style.css)
+- [app.js](./blob/main/final%20vvce/pedestrain_system/app.js)
+- [chat_backend.py](./blob/main/final%20vvce/pedestrain_system/chat_backend.py)
+- [exits.geojson](./blob/main/final%20vvce/pedestrain_system/data/exits.geojson)
 
 ## Run locally
 
-1. Download and extract the source archive from the original project repository.
+1. Download or clone this repository.
 2. Open `final vvce/pedestrain_system/index.html` in a modern browser.
 3. Allow internet access for map tiles.
 4. Set a start and destination on the map (or use the demo points).
@@ -40,4 +39,6 @@ The application files are under `final vvce/pedestrain_system/`:
 
 ## Collaboration acknowledgement
 
-This was developed as a group project. This repository is a portfolio summary maintained by Ramya S S. Contributions from the original team members are acknowledged; please refer to the original collaborative repository and team records for individual contribution attribution.
+This was developed as a group project. This repository is a portfolio copy maintained by Ramya S S. Contributions from the original team members are acknowledged; please refer to the original collaborative repository and team records for individual contribution attribution.
+
+Original collaborative repository: https://github.com/R-veen-a/Urban-Mobility-And-Smart-Cities
